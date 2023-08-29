@@ -25,7 +25,7 @@ namespace eShop.Data
         private static async Task<string> EnsureUser(IServiceProvider serviceProvider,
                                                     string testUserPw, string UserName)
         {
-            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
+            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>() ?? throw new ArgumentException("Missing User Manager service");
 
             var user = await userManager.FindByNameAsync(UserName);
             if (user == null)
@@ -49,12 +49,7 @@ namespace eShop.Data
         private static async Task<IdentityResult> EnsureRole(IServiceProvider serviceProvider,
                                                                      string uid, string role)
         {
-            var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
-
-            if (roleManager == null)
-            {
-                throw new Exception("roleManager null");
-            }
+            var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>() ?? throw new Exception("roleManager null");
 
             IdentityResult IR;
             if (!await roleManager.RoleExistsAsync(role))
@@ -62,7 +57,7 @@ namespace eShop.Data
                 IR = await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
+            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>() ?? throw new Exception("userManager null");
 
             var user = await userManager.FindByIdAsync(uid);
 

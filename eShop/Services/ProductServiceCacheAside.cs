@@ -103,18 +103,14 @@ namespace eShop.Services
                         yield return product;
                     }
                 }
-
-                
-
             }
-
          }
 
         public async Task<Product?> GetProductByIdAsync(int productId)
         {
             var byteArrayFromCache = await _cache.GetAsync(CacheKeyConstants.ProductPrefix + productId);
-            if (byteArrayFromCache.IsNullOrEmpty())
-            {
+            if (byteArrayFromCache is null)
+             {
                 var productById = await Task.Run(() => _context.Product.Where(product => product.Id == productId).FirstOrDefault());
                 if (productById == null)
                 {

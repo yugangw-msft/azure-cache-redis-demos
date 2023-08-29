@@ -80,7 +80,7 @@ namespace eShop.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            Product _product = await _productService.GetProductByIdAsync(id);
+            Product? _product = await _productService.GetProductByIdAsync(id);
 
             if (_product == null)
             {

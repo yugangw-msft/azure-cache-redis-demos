@@ -2,18 +2,23 @@
 using System.Text.Json;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Microsoft.IdentityModel.Tokens;
 
 namespace eShop.Helpers
 {
     public static class ConvertData<T>
     {
-        public static async IAsyncEnumerable<T> ByteArrayToObjectList(byte[] inputByteArray)
+        public static async IAsyncEnumerable<T> ByteArrayToObjectList(byte[]? inputByteArray)
         {
-            IAsyncEnumerable<T> deserializedList = JsonSerializer.DeserializeAsyncEnumerable<T>(new MemoryStream(inputByteArray));
-            //return deserializedList;
-            await foreach (T _item in deserializedList)
+            if (inputByteArray is null)
             {
-                yield return _item;
+                yield break;
+            }
+            IAsyncEnumerable<T?> deserializedList = JsonSerializer.DeserializeAsyncEnumerable<T>(new MemoryStream(inputByteArray));
+            
+            await foreach (T? _item in deserializedList)
+            {
+                if (_item is not null) yield return _item;
             }
         }
 
@@ -29,7 +34,9 @@ namespace eShop.Helpers
 
         public static async Task<T> ByteArrayToObject(byte[] inputByteArray)
         {
+#nullable disable
             return await JsonSerializer.DeserializeAsync<T>(new MemoryStream(inputByteArray));
+#nullable enable
         }
 
         public static async Task<byte[]> ObjectToByteArray(T input)

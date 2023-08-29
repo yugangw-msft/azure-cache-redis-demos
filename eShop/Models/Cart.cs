@@ -7,7 +7,7 @@ public class Cart
 {
     public int Id { get; set; }
     public string BuyerId { get; set; }
-    public IAsyncEnumerable<CartItem> _items { get; set; }
+    public IAsyncEnumerable<CartItem> _items { get; set; } = Enumerable.Empty<CartItem>().ToAsyncEnumerable<CartItem>();
     public int TotalItems => _items.SumAsync(i => i.Quantity).Result;
 
     public Cart(string buyerId)
@@ -29,7 +29,7 @@ public class Cart
         }
     }
 
-    public async Task CopyItemAsync(CartItem item)
+    public void CopyItemAsync(CartItem item)
     {
         _items = _items.Append(item);
     }

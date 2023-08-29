@@ -137,13 +137,11 @@ namespace eShop.Areas.Identity.Pages.Account
                 }
             }
 
-
-
             // If we got this far, something failed, redisplay form
             return Page();
         }
 
-        private async Task TransferAnonymousCartToUserAsync(string? userName)
+        private async Task TransferAnonymousCartToUserAsync(string userName)
         {
             if (Request.Cookies.ContainsKey(Constants.CART_COOKIENAME))
             {

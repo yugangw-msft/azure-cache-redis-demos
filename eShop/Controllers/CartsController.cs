@@ -21,11 +21,17 @@ namespace eShop.Controllers
         
         public async Task<ActionResult> Index()
         {
-
             List<ShoppingCartItem> ShoppingList = new List<ShoppingCartItem>();
 
             string username = GetOrSetBasketCookieAndUserName();
-            List<CartItem> CartItemList = await _cartService.GetCartItems(username).ToListAsync();
+            var items = _cartService.GetCartItems(username);
+            
+            if (items is null)
+            {
+                return View(ShoppingList);
+            }
+
+            List<CartItem> CartItemList = await items.ToListAsync();
 
             if (CartItemList.IsNullOrEmpty())
             {
@@ -109,22 +115,19 @@ namespace eShop.Controllers
         private string GetOrSetBasketCookieAndUserName()
         {
             string? userName = null;
-
-            if (Request.HttpContext.User.Identity.IsAuthenticated)
+            bool? isAuthenticated = Request.HttpContext.User.Identity?.IsAuthenticated;
+            if (isAuthenticated == true)
             {
-                return Request.HttpContext.User.Identity.Name!;
+                return Request.HttpContext.User.Identity?.Name!;
             }
 
             if (Request.Cookies.ContainsKey(Constants.CART_COOKIENAME))
             {
                 userName = Request.Cookies[Constants.CART_COOKIENAME];
 
-                if (!Request.HttpContext.User.Identity.IsAuthenticated)
+                if (!Guid.TryParse(userName, out var _))
                 {
-                    if (!Guid.TryParse(userName, out var _))
-                    {
-                        userName = null;
-                    }
+                    userName = null;
                 }
             }
             if (userName != null) return userName;
